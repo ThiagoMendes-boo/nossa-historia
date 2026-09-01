@@ -898,7 +898,7 @@ if (!reduceMotion){
     });
   }
 
- document.getElementById('btnMusica').addEventListener('click', function() {
+document.getElementById('btnMusica').addEventListener('click', function() {
   if (!ytPlayer) return;
   if (tocando) {
     ytPlayer.pauseVideo();
@@ -906,7 +906,8 @@ if (!reduceMotion){
     this.classList.remove('playing');
   } else {
     ytPlayer.playVideo();
-    this.querySelector('.music-text').textContent = 'Tocando...';
+    const dados = ytPlayer.getVideoData();
+    this.querySelector('.music-text').textContent = dados.title || 'Tocando...';
     this.classList.add('playing');
   }
   tocando = !tocando;
