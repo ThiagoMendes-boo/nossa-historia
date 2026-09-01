@@ -408,7 +408,25 @@ h1, h2, h3{
   border-color: var(--wine);
 }
 
+.music-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+  background: #1a1a1a;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+
+
 /* ============================= ÁLBUM ============================= */
+
 
 .album-grid{
   display: grid;
@@ -523,6 +541,11 @@ footer{
 </head>
 <body>
 
+  <!-- Player de música -->
+<div style="position:absolute; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none;">
+  <div id="player"></div>
+</div>
+<button id="btnMusica" class="music-btn">🎵</button>
 <nav class="nav" id="nav">
   <div class="nav-mark">Nossa História</div>
   <ul class="nav-links">
@@ -647,6 +670,23 @@ Você não tem a mínima noção do quanto a minha vida se tornou melhor depois 
 
 Às vezes eu paro e penso em onde eu estaria hoje se nossos caminhos nunca tivessem se cruzado. E, sinceramente, eu nem gosto de imaginar. Porque você chegou e mudou tantas coisas dentro de mim. Você esteve comigo em momentos que talvez você nem saiba o tamanho que tiveram para mim. Quando eu estava mal, você ficou. Quando eu precisava de alguém, você estava ali. Quando eu precisei de calma, você foi minha calma. Quando eu precisei de carinho, você me abraçou.`,
       signature: "— Thiago"
+    }
+    // Para adicionar outra carta, copie o bloco acima, separe com vírgula
+    // e mude o title / date / body / signature.
+  ],
+
+  letters: [
+    {
+      title: "Para você, Minha Gatinha Linda",
+      date: "31/08",
+      body: `Meu amor,
+
+      Começo esa carta aqui, as 23:00 em ponto meu amor, logo após entregar aquele trabalho que eu tinha te dito que o prazo era hoje ate as 23:59 KKKKKKKKKKKKKKKKKKK, eu queria falar que hoje foi um dia muito  importante para nós, para tudo o que somos e o que seremos, meu amor, você não tem noção de como eu estava com saudades de nós, da nossa energia da nossa felicidade transbordando que dava pra ver e sentir, só pela conversa em call..
+      
+      Eu coloquei meus fonos, abri o meu projeto que esta tudo isso aqui que fiz pra ti, e meu amor, isso não é nem 1% de tudo o que sinto por você meu amor, essa é apenas mais uma forma que eu tenho de mostrar pra você o quanto esse homem aqui te ama...sabe, hoje eu me peguei chorando relembrando de todos os nossos momentos
+      
+      `,
+      signature: "— Seu Príncipe Lindoo"
     }
     // Para adicionar outra carta, copie o bloco acima, separe com vírgula
     // e mude o title / date / body / signature.
@@ -813,6 +853,29 @@ if (!reduceMotion){
   }, { passive: true });
 }
 </script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+  let ytPlayer;
+  let tocando = false;
 
-</body>
-</html>
+  function onYouTubeIframeAPIReady() {
+    ytPlayer = new YT.Player('player', {
+      videoId: 'n1Hzf_is8tI',
+      playerVars: { loop: 1, playlist: 'n1Hzf_is8tI' }
+    });
+  }
+
+  document.getElementById('btnMusica').addEventListener('click', function() {
+    if (!ytPlayer) return;
+    if (tocando) {
+      ytPlayer.pauseVideo();
+      this.textContent = '🎵';
+    } else {
+      ytPlayer.playVideo();
+      this.textContent = '⏸️';
+    }
+    tocando = !tocando;
+  });
+</script>
+  </body>
+  </html>
