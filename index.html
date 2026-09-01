@@ -898,6 +898,8 @@ if (!reduceMotion){
     });
   }
 
+const nomeDaMusica = "The First Time - A Nossa Música"; // troque aqui
+
 document.getElementById('btnMusica').addEventListener('click', function() {
   if (!ytPlayer) return;
   if (tocando) {
@@ -906,8 +908,7 @@ document.getElementById('btnMusica').addEventListener('click', function() {
     this.classList.remove('playing');
   } else {
     ytPlayer.playVideo();
-    const dados = ytPlayer.getVideoData();
-    this.querySelector('.music-text').textContent = dados.title || 'Tocando...';
+    this.querySelector('.music-text').textContent = nomeDaMusica;
     this.classList.add('playing');
   }
   tocando = !tocando;
