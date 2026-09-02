@@ -685,6 +685,159 @@ footer{
   .counter-number{ font-size: 1.6rem; }
 }
 
+.recados-section {
+  max-width: 500px;
+  margin: 60px auto;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.recado-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.recado-form input,
+.recado-form textarea {
+  background: #ffffff;
+  border: 1px solid #e5d9d5;
+  border-radius: 14px;
+  padding: 14px 18px;
+  color: #3a2a2c;
+  font-family: inherit;
+  resize: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.recado-form input:focus,
+.recado-form textarea:focus {
+  outline: none;
+  border-color: var(--wine);
+  box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.08);
+}
+
+.recado-form textarea {
+  min-height: 90px;
+}
+
+.contador-chars {
+  display: block;
+  text-align: right;
+  font-size: 12px;
+  color: #a89a96;
+  margin-top: -6px;
+}
+
+.foto-label {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.preview-foto {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.remover-foto {
+  background: none;
+  border: none;
+  color: #a89a96;
+  font-size: 12px;
+  cursor: pointer;
+  align-self: flex-start;
+  text-decoration: underline;
+}
+
+.recado-form button[type="submit"] {
+  background: linear-gradient(135deg, var(--wine), #4a0e13);
+  border: none;
+  border-radius: 50px;
+  padding: 13px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.recado-form button[type="submit"]:hover {
+  transform: translateY(-2px);
+}
+
+.lista-recados {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+
+.recado-item {
+  background: #ffffff;
+  border: 1px solid #efe4e0;
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.recado-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.recado-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.recado-topo strong {
+  color: var(--wine);
+  font-size: 14.5px;
+}
+
+.recado-data {
+  font-size: 12px;
+  color: #a89a96;
+}
+
+.recado-item p {
+  margin: 0;
+  color: #3a2a2c;
+  line-height: 1.5;
+}
+
+.recado-foto {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 10px;
+  display: block;
+}
+
+.recado-excluir {
+  background: none;
+  border: none;
+  color: #c9b8b4;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.recado-excluir:hover {
+  color: var(--wine);
+  background: rgba(139, 0, 0, 0.08);
+}
+
 </style>
 </head>
 <body>
@@ -736,7 +889,12 @@ footer{
     <button type="submit">Escreva aqui seus sentimentos</button>
   </form>
   <div id="listaRecados" class="lista-recados"></div>
+<label for="inputFoto" class="foto-label" title="Adicionar foto">📷</label>
+    <input type="file" id="inputFoto" accept="image/*" hidden>
+    <img id="previewFoto" class="preview-foto" style="display:none;">
+    <button type="button" id="removerFoto" class="remover-foto" style="display:none;">Remover foto</button>
 </section>
+
 
 <!-- ============================= CARTA ============================= -->
 <section class="letters-section" id="carta">
@@ -1113,6 +1271,160 @@ input.addEventListener('input', () => {
           <button class="recado-excluir" title="Excluir">✕</button>
         </div>
         <p>${dado.texto}</p>
+      `;
+
+      item.querySelector('.recado-excluir').addEventListener('click', async () => {
+        if (confirm('Excluir esse recado?')) {
+          await deleteDoc(doc(db, 'recados', docSnap.id));
+        }
+      });
+
+      lista.appendChild(item);
+    });
+  });
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, deleteDoc, doc, query, orderBy, onSnapshot, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCqFYV4qagwDegZVB1Ua9dqZbnoIxTJS2c",
+    authDomain: "nossa-historia-b2c7c.firebaseapp.com",
+    projectId: "nossa-historia-b2c7c",
+    storageBucket: "nossa-historia-b2c7c.firebasestorage.app",
+    messagingSenderId: "287263472721",
+    appId: "1:287263472721:web:f250c19cf307534b000c70"
+  };
+
+  const IMGBB_API_KEY = "1472f66f9219a4749a6a485704639cad";
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const recadosRef = collection(db, "recados");
+
+  const form = document.getElementById('formRecado');
+  const input = document.getElementById('inputRecado');
+  const nomeInput = document.getElementById('inputNome');
+  const lista = document.getElementById('listaRecados');
+  const contador = document.getElementById('contadorChars');
+  const inputFoto = document.getElementById('inputFoto');
+  const previewFoto = document.getElementById('previewFoto');
+  const removerFotoBtn = document.getElementById('removerFoto');
+
+  let arquivoComprimido = null;
+
+  input.addEventListener('input', () => {
+    contador.textContent = `${input.value.length}/5000`;
+  });
+
+  function comprimirImagem(file, maxLargura = 1000, qualidade = 0.7) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const escala = Math.min(1, maxLargura / img.width);
+          canvas.width = img.width * escala;
+          canvas.height = img.height * escala;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob((blob) => resolve(blob), 'image/jpeg', qualidade);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  inputFoto.addEventListener('change', async () => {
+    const file = inputFoto.files[0];
+    if (!file) return;
+
+    arquivoComprimido = await comprimirImagem(file);
+    previewFoto.src = URL.createObjectURL(arquivoComprimido);
+    previewFoto.style.display = 'block';
+    removerFotoBtn.style.display = 'inline-block';
+  });
+
+  removerFotoBtn.addEventListener('click', () => {
+    arquivoComprimido = null;
+    inputFoto.value = '';
+    previewFoto.style.display = 'none';
+    removerFotoBtn.style.display = 'none';
+  });
+
+  async function uploadImgBB(blob) {
+    const formData = new FormData();
+    formData.append('image', blob);
+    const resp = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+      method: 'POST',
+      body: formData
+    });
+    const dados = await resp.json();
+    return dados.data.url;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!input.value.trim()) return;
+
+    const btnSubmit = form.querySelector('button[type="submit"]');
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'Enviando...';
+
+    let fotoUrl = null;
+    if (arquivoComprimido) {
+      fotoUrl = await uploadImgBB(arquivoComprimido);
+    }
+
+    await addDoc(recadosRef, {
+      nome: nomeInput.value.trim() || "Anônimo",
+      texto: input.value.trim(),
+      foto: fotoUrl,
+      criadoEm: serverTimestamp()
+    });
+
+    input.value = '';
+    nomeInput.value = '';
+    contador.textContent = '0/5000';
+    arquivoComprimido = null;
+    inputFoto.value = '';
+    previewFoto.style.display = 'none';
+    removerFotoBtn.style.display = 'none';
+    btnSubmit.disabled = false;
+    btnSubmit.textContent = 'Enviar recado';
+  });
+
+  const q = query(recadosRef, orderBy('criadoEm', 'desc'));
+  onSnapshot(q, (snapshot) => {
+    lista.innerHTML = '';
+    snapshot.forEach((docSnap) => {
+      const dado = docSnap.data();
+      const item = document.createElement('div');
+      item.className = 'recado-item';
+
+      let dataFormatada = '';
+      if (dado.criadoEm) {
+        const data = dado.criadoEm.toDate();
+        dataFormatada = data.toLocaleDateString('pt-BR', {
+          day: '2-digit', month: 'short', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+      }
+
+      const imgHtml = dado.foto ? `<img src="${dado.foto}" class="recado-foto">` : '';
+
+      item.innerHTML = `
+        <div class="recado-topo">
+          <strong>${dado.nome}</strong>
+          <span class="recado-data">${dataFormatada}</span>
+          <button class="recado-excluir" title="Excluir">✕</button>
+        </div>
+        <p>${dado.texto}</p>
+        ${imgHtml}
       `;
 
       item.querySelector('.recado-excluir').addEventListener('click', async () => {
