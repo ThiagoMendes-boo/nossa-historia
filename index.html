@@ -541,6 +541,13 @@ h1, h2, h3{
   color: var(--wine);
   background: rgba(139, 0, 0, 0.08);
 }
+.contador-chars {
+  display: block;
+  text-align: right;
+  font-size: 12px;
+  color: #a89a96;
+  margin-top: -6px;
+}
 
 .music-btn:hover {
   transform: translateY(-3px) scale(1.03);
@@ -724,7 +731,8 @@ footer{
   <h2>Palavras de Amor</h2>
   <form id="formRecado" class="recado-form">
     <input type="text" id="inputNome" placeholder="Seu nome" maxlength="30">
-    <textarea id="inputRecado" placeholder="Escreva algo pra gente..." maxlength="500" required></textarea>
+<textarea id="inputRecado" placeholder="Escreva algo pra gente..." maxlength="5000" required></textarea>
+<span id="contadorChars" class="contador-chars">0/5000</span>    
     <button type="submit">Escreva aqui seus sentimentos</button>
   </form>
   <div id="listaRecados" class="lista-recados"></div>
@@ -1064,6 +1072,11 @@ document.getElementById('btnMusica').addEventListener('click', function() {
   const input = document.getElementById('inputRecado');
   const nomeInput = document.getElementById('inputNome');
   const lista = document.getElementById('listaRecados');
+const contador = document.getElementById('contadorChars');
+input.addEventListener('input', () => {
+  contador.textContent = `${input.value.length}/5000`;
+});
+
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
