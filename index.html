@@ -446,24 +446,33 @@ h1, h2, h3{
 
 .recado-form input,
 .recado-form textarea {
-  background: rgba(20, 10, 12, 0.8);
-  border: 1px solid var(--wine);
-  border-radius: 12px;
-  padding: 12px 16px;
-  color: #f5e6e0;
+  background: #ffffff;
+  border: 1px solid #e5d9d5;
+  border-radius: 14px;
+  padding: 14px 18px;
+  color: #3a2a2c;
   font-family: inherit;
   resize: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.recado-form input:focus,
+.recado-form textarea:focus {
+  outline: none;
+  border-color: var(--wine);
+  box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.08);
 }
 
 .recado-form textarea {
-  min-height: 80px;
+  min-height: 90px;
 }
 
 .recado-form button {
   background: linear-gradient(135deg, var(--wine), #4a0e13);
   border: none;
   border-radius: 50px;
-  padding: 12px;
+  padding: 13px;
   color: #fff;
   font-weight: 600;
   cursor: pointer;
@@ -482,22 +491,40 @@ h1, h2, h3{
 }
 
 .recado-item {
-  background: rgba(20, 10, 12, 0.6);
-  border-left: 3px solid var(--wine);
-  border-radius: 8px;
-  padding: 14px 18px;
+  background: #ffffff;
+  border: 1px solid #efe4e0;
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.recado-item strong {
+.recado-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.recado-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.recado-topo strong {
   color: var(--wine);
-  display: block;
-  margin-bottom: 4px;
-  font-size: 14px;
+  font-size: 14.5px;
+}
+
+.recado-data {
+  font-size: 12px;
+  color: #a89a96;
 }
 
 .recado-item p {
   margin: 0;
-  color: #f5e6e0;
+  color: #3a2a2c;
+  line-height: 1.5;
 }
 
 .music-btn:hover {
@@ -1034,17 +1061,33 @@ document.getElementById('btnMusica').addEventListener('click', function() {
     input.value = '';
   });
 
-  const q = query(recadosRef, orderBy('criadoEm', 'desc'));
-  onSnapshot(q, (snapshot) => {
-    lista.innerHTML = '';
-    snapshot.forEach((doc) => {
-      const dado = doc.data();
-      const item = document.createElement('div');
-      item.className = 'recado-item';
-      item.innerHTML = `<strong>${dado.nome}</strong><p>${dado.texto}</p>`;
-      lista.appendChild(item);
-    });
+const q = query(recadosRef, orderBy('criadoEm', 'desc'));
+onSnapshot(q, (snapshot) => {
+  lista.innerHTML = '';
+  snapshot.forEach((doc) => {
+    const dado = doc.data();
+    const item = document.createElement('div');
+    item.className = 'recado-item';
+
+    let dataFormatada = '';
+    if (dado.criadoEm) {
+      const data = dado.criadoEm.toDate();
+      dataFormatada = data.toLocaleDateString('pt-BR', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    item.innerHTML = `
+      <div class="recado-topo">
+        <strong>${dado.nome}</strong>
+        <span class="recado-data">${dataFormatada}</span>
+      </div>
+      <p>${dado.texto}</p>
+    `;
+    lista.appendChild(item);
   });
+});
 </script>
 
 </body>
