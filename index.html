@@ -430,6 +430,76 @@ h1, h2, h3{
   transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
+.recados-section {
+  max-width: 500px;
+  margin: 60px auto;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.recado-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.recado-form input,
+.recado-form textarea {
+  background: rgba(20, 10, 12, 0.8);
+  border: 1px solid var(--wine);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #f5e6e0;
+  font-family: inherit;
+  resize: none;
+}
+
+.recado-form textarea {
+  min-height: 80px;
+}
+
+.recado-form button {
+  background: linear-gradient(135deg, var(--wine), #4a0e13);
+  border: none;
+  border-radius: 50px;
+  padding: 12px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.recado-form button:hover {
+  transform: translateY(-2px);
+}
+
+.lista-recados {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+
+.recado-item {
+  background: rgba(20, 10, 12, 0.6);
+  border-left: 3px solid var(--wine);
+  border-radius: 8px;
+  padding: 14px 18px;
+}
+
+.recado-item strong {
+  color: var(--wine);
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.recado-item p {
+  margin: 0;
+  color: #f5e6e0;
+}
+
 .music-btn:hover {
   transform: translateY(-3px) scale(1.03);
   box-shadow: 0 10px 25px rgba(139, 0, 0, 0.5);
@@ -607,6 +677,16 @@ footer{
 
   <div class="scroll-cue">deslize</div>
 </header>
+
+<section class="recados-section">
+  <h2>Palavras de Amor</h2>
+  <form id="formRecado" class="recado-form">
+    <input type="text" id="inputNome" placeholder="Seu nome" maxlength="30">
+    <textarea id="inputRecado" placeholder="Escreva algo pra gente..." maxlength="500" required></textarea>
+    <button type="submit">Escreva aqui seus sentimentos</button>
+  </form>
+  <div id="listaRecados" class="lista-recados"></div>
+</section>
 
 <!-- ============================= CARTA ============================= -->
 <section class="letters-section" id="carta">
@@ -920,5 +1000,52 @@ document.getElementById('btnMusica').addEventListener('click', function() {
   tocando = !tocando;
 });
 </script>
-  </body>
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCqFYV4qagwDegZVB1Ua9dqZbnoIxTJS2c",
+    authDomain: "nossa-historia-b2c7c.firebaseapp.com",
+    projectId: "nossa-historia-b2c7c",
+    storageBucket: "nossa-historia-b2c7c.firebasestorage.app",
+    messagingSenderId: "287263472721",
+    appId: "1:287263472721:web:f250c19cf307534b000c70"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const recadosRef = collection(db, "recados");
+
+  const form = document.getElementById('formRecado');
+  const input = document.getElementById('inputRecado');
+  const nomeInput = document.getElementById('inputNome');
+  const lista = document.getElementById('listaRecados');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!input.value.trim()) return;
+    await addDoc(recadosRef, {
+      nome: nomeInput.value.trim() || "Anônimo",
+      texto: input.value.trim(),
+      criadoEm: serverTimestamp()
+    });
+    input.value = '';
+  });
+
+  const q = query(recadosRef, orderBy('criadoEm', 'desc'));
+  onSnapshot(q, (snapshot) => {
+    lista.innerHTML = '';
+    snapshot.forEach((doc) => {
+      const dado = doc.data();
+      const item = document.createElement('div');
+      item.className = 'recado-item';
+      item.innerHTML = `<strong>${dado.nome}</strong><p>${dado.texto}</p>`;
+      lista.appendChild(item);
+    });
+  });
+</script>
+
+</body>
   </html>
