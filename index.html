@@ -429,7 +429,6 @@ h1, h2, h3{
   backdrop-filter: blur(6px);
   transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
-
 .recados-section {
   max-width: 500px;
   margin: 60px auto;
@@ -525,6 +524,22 @@ h1, h2, h3{
   margin: 0;
   color: #3a2a2c;
   line-height: 1.5;
+}
+
+.recado-excluir {
+  background: none;
+  border: none;
+  color: #c9b8b4;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.recado-excluir:hover {
+  color: var(--wine);
+  background: rgba(139, 0, 0, 0.08);
 }
 
 .music-btn:hover {
@@ -1029,7 +1044,7 @@ document.getElementById('btnMusica').addEventListener('click', function() {
 </script>
  <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp }
+  import { getFirestore, collection, addDoc, deleteDoc, doc, query, orderBy, onSnapshot, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -1061,33 +1076,41 @@ document.getElementById('btnMusica').addEventListener('click', function() {
     input.value = '';
   });
 
-const q = query(recadosRef, orderBy('criadoEm', 'desc'));
-onSnapshot(q, (snapshot) => {
-  lista.innerHTML = '';
-  snapshot.forEach((doc) => {
-    const dado = doc.data();
-    const item = document.createElement('div');
-    item.className = 'recado-item';
+  const q = query(recadosRef, orderBy('criadoEm', 'desc'));
+  onSnapshot(q, (snapshot) => {
+    lista.innerHTML = '';
+    snapshot.forEach((docSnap) => {
+      const dado = docSnap.data();
+      const item = document.createElement('div');
+      item.className = 'recado-item';
 
-    let dataFormatada = '';
-    if (dado.criadoEm) {
-      const data = dado.criadoEm.toDate();
-      dataFormatada = data.toLocaleDateString('pt-BR', {
-        day: '2-digit', month: 'short', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
+      let dataFormatada = '';
+      if (dado.criadoEm) {
+        const data = dado.criadoEm.toDate();
+        dataFormatada = data.toLocaleDateString('pt-BR', {
+          day: '2-digit', month: 'short', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+      }
+
+      item.innerHTML = `
+        <div class="recado-topo">
+          <strong>${dado.nome}</strong>
+          <span class="recado-data">${dataFormatada}</span>
+          <button class="recado-excluir" title="Excluir">✕</button>
+        </div>
+        <p>${dado.texto}</p>
+      `;
+
+      item.querySelector('.recado-excluir').addEventListener('click', async () => {
+        if (confirm('Excluir esse recado?')) {
+          await deleteDoc(doc(db, 'recados', docSnap.id));
+        }
       });
-    }
 
-    item.innerHTML = `
-      <div class="recado-topo">
-        <strong>${dado.nome}</strong>
-        <span class="recado-data">${dataFormatada}</span>
-      </div>
-      <p>${dado.texto}</p>
-    `;
-    lista.appendChild(item);
+      lista.appendChild(item);
+    });
   });
-});
 </script>
 
 </body>
